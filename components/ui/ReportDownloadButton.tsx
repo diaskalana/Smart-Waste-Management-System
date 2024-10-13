@@ -50,7 +50,7 @@ const ReportDownloadButton = ({
   return (
     <div>
       <button
-        className={`bg-green-500 text-white p-4 rounded-lg shadow-md w-full flex items-center justify-center transition duration-300 ease-in-out ${
+        className={`bg-green-500 text-white p-4 rounded-lg shadow-md w-full h-full flex items-center justify-center transition duration-300 ease-in-out ${
           loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
         }`}
         onClick={handleDownload}
