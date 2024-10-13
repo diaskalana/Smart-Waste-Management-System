@@ -3,16 +3,17 @@ import { useState } from "react";
 
 interface ReportDownloadButtonProps {
   reportType: string;
+  label: string;
 }
 
-const ReportDownloadButton = ({ reportType }: ReportDownloadButtonProps) => {
+const ReportDownloadButton = ({ reportType, label }: ReportDownloadButtonProps) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
   // Function to handle report download
   const handleDownload = async () => {
     setLoading(true);
-    setError(null); // Reset error
+    setError("");
 
     try {
       const response = await fetch(`/api/reports/download?type=${reportType}`, {
@@ -20,43 +21,42 @@ const ReportDownloadButton = ({ reportType }: ReportDownloadButtonProps) => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to generate ${reportType} report`);
+        throw new Error("Failed to generate report");
       }
 
-      // Convert the response to a Blob and trigger download
+      // Convert the response to a Blob (binary large object)
       const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
 
+      // Create a link element and trigger a download
       const downloadLink = document.createElement("a");
-      downloadLink.href = downloadUrl;
-      downloadLink.download = `${reportType}_report.pdf`; // Filename for the download
-      downloadLink.click();
+      const url = window.URL.createObjectURL(blob);
+      downloadLink.href = url;
+      downloadLink.download = `${reportType}_report.pdf`; // Set the filename
+      downloadLink.click(); // Trigger the download
 
-      // Clean up after download
-      window.URL.revokeObjectURL(downloadUrl);
+      // Clean up the URL object
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      setError(`Error downloading ${reportType} report. Please try again.`);
-      console.error("Download error:", error);
+      setError("Error downloading report");
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full">
+    <div>
       <button
-        className={`bg-green-500 text-white p-4 rounded-lg shadow-md w-full h-full flex items-center justify-center transition duration-300 ease-in-out ${
-          loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
-        }`}
+        className="bg-green-500 w-full text-white p-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 ease-in-out flex items-center justify-center"
         onClick={handleDownload}
         disabled={loading}
       >
         <Download className="w-6 h-6 mr-2" />
         <span className="text-lg font-semibold">
-          {loading ? "Generating..." : `Download ${reportType} Report`}
+          {loading ? "Generating..." : `Download ${label} Report`}
         </span>
       </button>
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };
