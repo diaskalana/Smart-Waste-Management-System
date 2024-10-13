@@ -8,9 +8,12 @@ import { eq, sql } from "drizzle-orm";
 const getTableHeaders = (reportType: string) => {
   const headersMap: { [key: string]: string } = {
     user_activity: "<th>#</th><th>Location</th><th>Report Count</th>",
-    collection_efficiency:
-      "<th>#</th><th>Total Reports</th><th>Collected Reports</th>",
+    collection_efficiency: "<th>#</th><th>Total Reports</th><th>Collected Reports</th>",
     reward_engagement: "<th>#</th><th>Waste Type</th><th>Total Amount</th>",
+    user_engagement_by_date: "<th>#</th><th>Date</th><th>Report Count</th>",
+    average_waste_per_location: "<th>#</th><th>Location</th><th>Average Waste</th>",
+    waste_type_by_location: "<th>#</th><th>Location</th><th>Waste Type</th><th>Report Count</th>",
+    collector_efficiency: "<th>#</th><th>Collector ID</th><th>Collected Reports</th>",
   };
   return headersMap[reportType] || "";
 };
@@ -50,6 +53,51 @@ const queryReportData = async (type: string) => {
         })
         .from(Reports)
         .groupBy(Reports.wasteType);
+
+
+    case "user_engagement_by_date":
+      return db
+        .select({
+          date: sql<Date>`DATE(${Reports.createdAt})`.as("date"),
+          reportCount: sql<number>`COUNT(${Reports.id})`.as("reportCount"),
+        })
+        .from(Reports)
+        .groupBy(sql`DATE(${Reports.createdAt})`);
+
+
+    case "average_waste_per_location":
+      return db
+        .select({
+          location: Reports.location,
+          averageWaste:
+            sql<number>`AVG(CAST(REGEXP_REPLACE(${Reports.amount}, '[^0-9.]+', '', 'g') AS FLOAT))`.as(
+              "averageWaste"
+            ),
+        })
+        .from(Reports)
+        .groupBy(Reports.location);
+     
+
+    case "waste_type_by_location":
+      return db
+        .select({
+          location: Reports.location,
+          wasteType: Reports.wasteType,
+          reportCount: sql<number>`COUNT(${Reports.id})`.as("reportCount"),
+        })
+        .from(Reports)
+        .groupBy(Reports.location, Reports.wasteType);
+
+    case "collector_efficiency":
+      return db
+        .select({
+          collectorId: CollectedWastes.collectorId,
+          collectedReports: sql<number>`COUNT(${CollectedWastes.reportId})`.as(
+            "collectedReports"
+          ),
+        })
+        .from(CollectedWastes)
+        .groupBy(CollectedWastes.collectorId);
 
     default:
       throw new Error("Invalid report type");
