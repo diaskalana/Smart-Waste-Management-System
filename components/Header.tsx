@@ -165,8 +165,18 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
       setLoggedIn(true);
       const user = await web3auth.getUserInfo();
       setUserInfo(user);
+
+      console.log("user info from header", user);
+
       if (user.email) {
         localStorage.setItem("userEmail", user.email);
+        
+        setCookie("userEmail", user.email, {
+          httpOnly: true, 
+          secure: process.env.NODE_ENV === "production", 
+          sameSite: "Strict", 
+        });
+
         try {
           await createUser(user.email, user.name || "Anonymous User");
         } catch (error) {

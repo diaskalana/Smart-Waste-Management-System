@@ -6,6 +6,7 @@ export const Users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  role: varchar("role", { length: 255 }).notNull().default("user"),
 });
 
 // Reports table
@@ -64,3 +65,4 @@ export const Transactions = pgTable("transactions", {
   description: text("description").notNull(),
   date: timestamp("date").defaultNow().notNull(),
 });
+

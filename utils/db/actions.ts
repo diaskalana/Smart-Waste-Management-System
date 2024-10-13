@@ -477,3 +477,14 @@ export async function getUserBalance(userId: number): Promise<number> {
   return Math.max(balance, 0); // Ensure balance is never negative
 }
 
+
+//Get User Role by email
+export async function getUserRoleByEmail(email: string) {
+  try {
+    const [user] = await db.select().from(Users).where(eq(Users.email, email)).execute();
+    return user.role;
+  } catch (error) {
+    console.error("Error fetching user by email:", error);
+    return null;
+  }
+}
