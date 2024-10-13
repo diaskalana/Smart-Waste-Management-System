@@ -20,7 +20,7 @@ export default function DownloadsPage() {
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Download Reports</h1>
 
       {/* User Activity Reports */}
-      <div>
+      <div className="mt-16">
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">User Activity Reports</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
           {userActivityReports.map((report) => (
@@ -34,7 +34,7 @@ export default function DownloadsPage() {
       </div>
 
       {/* Waste Collection Reports */}
-      <div>
+      <div className="mt-16">
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">Waste Collection Reports</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {wasteCollectionReports.map((report) => (

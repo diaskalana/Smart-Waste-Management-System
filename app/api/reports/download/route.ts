@@ -8,12 +8,16 @@ import { eq, sql } from "drizzle-orm";
 const getTableHeaders = (reportType: string) => {
   const headersMap: { [key: string]: string } = {
     user_activity: "<th>#</th><th>Location</th><th>Report Count</th>",
-    collection_efficiency: "<th>#</th><th>Total Reports</th><th>Collected Reports</th>",
+    collection_efficiency:
+      "<th>#</th><th>Total Reports</th><th>Collected Reports</th>",
     reward_engagement: "<th>#</th><th>Waste Type</th><th>Total Amount</th>",
     user_engagement_by_date: "<th>#</th><th>Date</th><th>Report Count</th>",
-    average_waste_per_location: "<th>#</th><th>Location</th><th>Average Waste</th>",
-    waste_type_by_location: "<th>#</th><th>Location</th><th>Waste Type</th><th>Report Count</th>",
-    collector_efficiency: "<th>#</th><th>Collector ID</th><th>Collected Reports</th>",
+    average_waste_per_location:
+      "<th>#</th><th>Location</th><th>Average Waste</th>",
+    waste_type_by_location:
+      "<th>#</th><th>Location</th><th>Waste Type</th><th>Report Count</th>",
+    collector_efficiency:
+      "<th>#</th><th>Collector ID</th><th>Collected Reports</th>",
   };
   return headersMap[reportType] || "";
 };
@@ -54,7 +58,6 @@ const queryReportData = async (type: string) => {
         .from(Reports)
         .groupBy(Reports.wasteType);
 
-
     case "user_engagement_by_date":
       return db
         .select({
@@ -63,7 +66,6 @@ const queryReportData = async (type: string) => {
         })
         .from(Reports)
         .groupBy(sql`DATE(${Reports.createdAt})`);
-
 
     case "average_waste_per_location":
       return db
@@ -76,7 +78,6 @@ const queryReportData = async (type: string) => {
         })
         .from(Reports)
         .groupBy(Reports.location);
-     
 
     case "waste_type_by_location":
       return db
@@ -122,31 +123,66 @@ const generateHtmlContent = (data: any[], reportType: string) => {
   const headers = getTableHeaders(reportType);
 
   return `
-    <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1 { text-align: center; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-          th { background-color: #f2f2f2; }
-        </style>
-      </head>
-      <body>
-        <h1>${reportType.toUpperCase()} REPORT</h1>
-        <table>
-          <thead>
-            <tr>
-              ${headers}
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-      </body>
-    </html>
-  `;
+  <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        canvas { margin: 40px auto; display: block; }
+      </style>
+    </head>
+    <body>
+      <h1>${reportType.toUpperCase()} REPORT</h1>
+      <canvas id="chart"></canvas> <!-- Chart goes here -->
+      <table>
+        <thead>
+          <tr>
+            ${headers}
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script>
+        const ctx = document.getElementById('chart').getContext('2d');
+        const chartData = {
+          labels: ${JSON.stringify(
+            data.map((item) => item.location || item.wasteType)
+          )}, 
+          datasets: [{
+            label: '${reportType} Data',
+            data: ${JSON.stringify(
+              data.map(
+                (item) =>
+                  item.reportCount || item.totalAmount || item.collectedReports
+              )
+            )},
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        };
+
+        new Chart(ctx, {
+          type: 'bar', // You can change this to 'line', 'pie', etc.
+          data: chartData,
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      </script>
+    </body>
+  </html>
+`;
 };
 
 // API handler function
@@ -177,7 +213,7 @@ export async function GET(req: NextRequest) {
     const page = await browser.newPage();
 
     // Set the HTML content for the page
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    await page.setContent(htmlContent, { waitUntil: "networkidle2" });
 
     // Generate PDF from the HTML content
     const pdfBuffer = await page.pdf({

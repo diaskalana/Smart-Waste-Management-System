@@ -6,7 +6,10 @@ interface ReportDownloadButtonProps {
   label: string;
 }
 
-const ReportDownloadButton = ({ reportType, label }: ReportDownloadButtonProps) => {
+const ReportDownloadButton = ({
+  reportType,
+  label,
+}: ReportDownloadButtonProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -47,7 +50,9 @@ const ReportDownloadButton = ({ reportType, label }: ReportDownloadButtonProps) 
   return (
     <div>
       <button
-        className="bg-green-500 w-full text-white p-4 rounded-lg shadow-md hover:bg-green-600 transition duration-300 ease-in-out flex items-center justify-center"
+        className={`bg-green-500 text-white p-4 rounded-lg shadow-md w-full flex items-center justify-center transition duration-300 ease-in-out ${
+          loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
+        }`}
         onClick={handleDownload}
         disabled={loading}
       >
