@@ -30,6 +30,7 @@ export default function RootLayout({
           if (user) {
             const availableRewards = (await getAvailableRewards(
               user.id
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             )) as any;
             console.log("availableRewards from layout", availableRewards);
             setTotalEarnings(availableRewards);

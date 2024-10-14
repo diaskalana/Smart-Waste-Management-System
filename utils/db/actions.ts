@@ -1,6 +1,6 @@
 import { db } from './dbConfig';
 import { Users, Reports, Rewards, CollectedWastes, Notifications, Transactions } from './schema';
-import { eq, sql, and, desc, ne } from 'drizzle-orm';
+import { eq, sql, and, desc } from 'drizzle-orm';
 
 export async function createUser(email: string, name: string) {
   try {
@@ -29,6 +29,7 @@ export async function createReport(
   amount: string,
   imageUrl?: string,
   type?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verificationResult?: any
 ) {
   try {
@@ -115,7 +116,7 @@ export async function updateRewardPoints(userId: number, pointsToAdd: number) {
   }
 }
 
-export async function createCollectedWaste(reportId: number, collectorId: number, notes?: string) {
+export async function createCollectedWaste(reportId: number, collectorId: number) {
   try {
     const [collectedWaste] = await db
       .insert(CollectedWastes)
@@ -268,7 +269,7 @@ export async function saveReward(userId: number, amount: number) {
   }
 }
 
-export async function saveCollectedWaste(reportId: number, collectorId: number, verificationResult: any) {
+export async function saveCollectedWaste(reportId: number, collectorId: number) {
   try {
     const [collectedWaste] = await db
       .insert(CollectedWastes)
@@ -289,6 +290,7 @@ export async function saveCollectedWaste(reportId: number, collectorId: number, 
 
 export async function updateTaskStatus(reportId: number, newStatus: string, collectorId?: number) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = { status: newStatus };
     if (collectorId !== undefined) {
       updateData.collectorId = collectorId;
@@ -346,14 +348,14 @@ export async function getRewardTransactions(userId: number) {
       .limit(10)
       .execute();
 
-    console.log('Raw transactions from database:', transactions)
+    // console.log('Raw transactions from database:', transactions)
 
     const formattedTransactions = transactions.map(t => ({
       ...t,
       date: t.date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
     }));
 
-    console.log('Formatted transactions:', formattedTransactions)
+    // console.log('Formatted transactions:', formattedTransactions)
     return formattedTransactions;
   } catch (error) {
     console.error("Error fetching reward transactions:", error);
@@ -363,7 +365,7 @@ export async function getRewardTransactions(userId: number) {
 
 export async function getAvailableRewards(userId: number) {
   try {
-    console.log('Fetching available rewards for user:', userId);
+    // console.log('Fetching available rewards for user:', userId);
     
     // Get user's total points
     const userTransactions = await getRewardTransactions(userId);
@@ -371,7 +373,7 @@ export async function getAvailableRewards(userId: number) {
       return transaction.type.startsWith('earned') ? total + transaction.amount : total - transaction.amount;
     }, 0);
 
-    console.log('User total points:', userPoints);
+    // console.log('User total points:', userPoints);
 
     // Get available rewards from the database
     const dbRewards = await db
@@ -424,6 +426,7 @@ export async function createTransaction(userId: number, type: 'earned_report' | 
 
 export async function redeemReward(userId: number, rewardId: number) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userReward = await getOrCreateReward(userId) as any;
     
     if (rewardId === 0) {

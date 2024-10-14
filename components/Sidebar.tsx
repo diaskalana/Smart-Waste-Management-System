@@ -10,6 +10,8 @@ import {
   Home,
   Download,
 } from "lucide-react";
+import { getUserByEmail } from "@/utils/db/actions";
+import { useEffect, useState } from "react";
 
 const sidebarItems = [
   { href: "/", icon: Home, label: "Home" },
@@ -17,6 +19,7 @@ const sidebarItems = [
   { href: "/collect", icon: Trash, label: "Collect Waste" },
   { href: "/rewards", icon: Coins, label: "Rewards" },
   { href: "/leaderboard", icon: Medal, label: "Leaderboard" },
+  { href: "/download", icon: Download, label: "Reports" },
 ];
 
 interface SidebarProps {
@@ -24,13 +27,38 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ open }: SidebarProps) {
-  const userEmail = localStorage.getItem("userEmail");
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const pathname = usePathname();
+  interface User {
+    id: number;
+    name: string;
+    role: string;
+    email: string;
+    createdAt: Date;
+  }
+  
+  const [user, setUser] = useState<User | null>(null);
 
-  if (userEmail === "maddprojectore@gmail.com" && !sidebarItems.some(item => item.href === "/download")) {
-    sidebarItems.push({ href: "/download", icon: Download, label: "Reports" });
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        const userEmail = localStorage.getItem("userEmail");
+        if (userEmail) {
+          const user = await getUserByEmail(userEmail);
+          console.log("user from layout", user);
+          setUser(user);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    getUserRole();
+  }, []);
+
+  if (user?.role === "staff") {
+    sidebarItems.push({ href: "/admin", icon: Home, label: "Admin" });
   }
 
-  const pathname = usePathname();
 
   return (
     <aside
