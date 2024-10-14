@@ -198,11 +198,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Query data based on the report type
+
     const data = await queryReportData(type);
     console.log(`${type} Data:`, data);
 
-    // Generate the HTML content for the PDF
     const htmlContent = generateHtmlContent(data, type);
 
     // Launch Puppeteer
@@ -244,3 +243,6 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+
+export {queryReportData, getTableHeaders, generateHtmlContent};

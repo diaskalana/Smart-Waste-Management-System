@@ -57,7 +57,7 @@ const ReportDownloadButton = ({
         disabled={loading}
       >
         <Download className="w-6 h-6 mr-2" />
-        <span className="text-lg font-semibold">
+        <span className="text-sm font-semibold">
           {loading ? "Generating..." : `Download ${label} Report`}
         </span>
       </button>
