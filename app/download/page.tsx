@@ -55,7 +55,7 @@ export default function DownloadsPage() {
       </h1>
 
       {/* User Activity Reports */}
-      <div className="mt-16">
+      <div className="bg-white p-8 rounded-2xl shadow-lg mb-12">
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
           User Activity Reports
         </h2>
@@ -71,7 +71,7 @@ export default function DownloadsPage() {
       </div>
 
       {/* Waste Collection Reports */}
-      <div className="mt-16">
+      <div className="bg-white p-8 rounded-2xl shadow-lg mb-12">
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
           Waste Collection Reports
         </h2>
