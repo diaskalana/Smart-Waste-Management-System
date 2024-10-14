@@ -19,7 +19,6 @@ const sidebarItems = [
   { href: "/collect", icon: Trash, label: "Collect Waste" },
   { href: "/rewards", icon: Coins, label: "Rewards" },
   { href: "/leaderboard", icon: Medal, label: "Leaderboard" },
-  { href: "/download", icon: Download, label: "Reports" },
 ];
 
 interface SidebarProps {
@@ -55,8 +54,8 @@ export default function Sidebar({ open }: SidebarProps) {
     getUserRole();
   }, []);
 
-  if (user?.role === "staff") {
-    sidebarItems.push({ href: "/admin", icon: Home, label: "Admin" });
+  if (user?.role === "staff" && !sidebarItems.some(item => item.href === "/download")) {
+    sidebarItems.push({ href: "/download", icon: Download, label: "Reports" });
   }
 
 
